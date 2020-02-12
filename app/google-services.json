@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "220006724769",
+    "firebase_url": "https://my-quizuser-app-e33fc.firebaseio.com",
+    "project_id": "my-quizuser-app-e33fc",
+    "storage_bucket": "my-quizuser-app-e33fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220006724769:android:b529f9e56e9ef04c3dece0",
+        "android_client_info": {
+          "package_name": "com.example.myquizuserapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "220006724769-6edt0ab494qvs9cic9jto4djr71edopr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myquizuserapp",
+            "certificate_hash": "1447336aed0e4ae1ff13b49efb6aaf5ee3942104"
+          }
+        },
+        {
+          "client_id": "220006724769-h8l7hpba191lnn5v4v83in4oeo8kgq54.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLxEOZdWVnNrT5HvS1Fwhvjg-7fA1GLH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "220006724769-h8l7hpba191lnn5v4v83in4oeo8kgq54.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
