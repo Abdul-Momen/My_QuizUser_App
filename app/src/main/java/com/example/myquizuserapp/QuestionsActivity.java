@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.animation.Animator;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,7 +27,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +44,17 @@ public class QuestionsActivity extends AppCompatActivity {
     private int count = 0;
     private int potion = 0;
     int score = 0;
+    private int macthQuePosition;
+    private Dialog loadingdailog;
+
+    ///shared prefarncee
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+    private Gson gson;
+    private List<QuestionModel> bookmarkslist;
+    //////////
+    public static final String FILE_NAME = "QUIZZER";
+    public static final String KEY_NAME = "QUESTIONS";
 
     private String catogory;
     private int setNo;
@@ -45,6 +63,7 @@ public class QuestionsActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference();
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +71,12 @@ public class QuestionsActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.qusToolbar);
         setSupportActionBar(toolbar);
+
+        loadingdailog = new Dialog(this);
+        loadingdailog.setContentView(R.layout.loading_dailog);
+        loadingdailog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_border));
+        loadingdailog.getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        loadingdailog.setCancelable(false);
 
 
         qustion = findViewById(R.id.questionId);
@@ -61,13 +86,33 @@ public class QuestionsActivity extends AppCompatActivity {
         shareButn = findViewById(R.id.sharebuttonId);
         nextButton = findViewById(R.id.nextButtonId);
 
+        preferences = getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        editor = preferences.edit();
+        gson = new Gson();
+
+
+        getBookmarks();
+        bookmarkButn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (modelMacth()) {
+
+                    bookmarkslist.remove(macthQuePosition);
+                    bookmarkButn.setImageDrawable(getDrawable(R.drawable.bookmark));
+                } else {
+                    bookmarkslist.add(list.get(potion));
+                    bookmarkButn.setImageDrawable(getDrawable(R.drawable.ic_bookmark_name));
+
+                }
+            }
+        });
 
         catogory = getIntent().getStringExtra("category");
         setNo = getIntent().getIntExtra("setno", 1);
 
 
         list = new ArrayList<>();
-
+        loadingdailog.show();
         myRef.child("sets").child(catogory).child("quesution").orderByChild("setno").equalTo(setNo).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -97,7 +142,10 @@ public class QuestionsActivity extends AppCompatActivity {
                             potion++;
                             if (potion == list.size()) {
                                 //score Activity
-
+                                Intent scoreinten = new Intent(QuestionsActivity.this, ScoreActivity.class);
+                                scoreinten.putExtra("scroe", score);
+                                scoreinten.putExtra("total", list.size());
+                                startActivity(scoreinten);
                                 return;
                             }
                             count = 0;
@@ -105,19 +153,46 @@ public class QuestionsActivity extends AppCompatActivity {
                         }
                     });
 
+                    shareButn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            String body = list.get(potion).getQuestion() + "\n"+
+                                    list.get(potion).getOptionA() +"\n"+
+                                    list.get(potion).getOptionB() +"\n"+
+                                    list.get(potion).getOptionC() +"\n"+
+                                    list.get(potion).getOptionC();
+                            Intent sintent = new Intent(Intent.ACTION_SEND);
+                            sintent.setType("text/plain");
+                            sintent.putExtra(Intent.EXTRA_SUBJECT, "Quizzer challaenge");
+                            sintent.putExtra(Intent.EXTRA_TEXT, body);
+                            startActivity(Intent.createChooser(sintent, "Share via"));
+                        }
+                    });
+
+
                 } else {
                     finish();
                     Toast.makeText(QuestionsActivity.this, "No Qusention", Toast.LENGTH_SHORT).show();
                 }
+                loadingdailog.dismiss();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(QuestionsActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                loadingdailog.dismiss();
+                finish();
             }
         });
 
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        storeBookmarks();
     }
 
     ////////playAnimation//////////
@@ -143,6 +218,7 @@ public class QuestionsActivity extends AppCompatActivity {
                         }
                     }
 
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         //data change
@@ -150,6 +226,14 @@ public class QuestionsActivity extends AppCompatActivity {
                             try {
                                 ((TextView) view).setText(data);
                                 noIdecator.setText(potion + 1 + "/" + list.size());
+                                if (modelMacth()) {
+
+                                    bookmarkButn.setImageDrawable(getDrawable(R.drawable.ic_bookmark_name));
+
+                                } else {
+                                    bookmarkButn.setImageDrawable(getDrawable(R.drawable.bookmark));
+
+                                }
                             } catch (ClassCastException ex) {
                                 ((Button) view).setText(data);
                             }
@@ -203,5 +287,39 @@ public class QuestionsActivity extends AppCompatActivity {
         }
     }
 
+    private void getBookmarks() {
+        String json = preferences.getString(KEY_NAME, "");
+        Type type = new TypeToken<List<QuestionModel>>() {
+        }.getType();
+        bookmarkslist = gson.fromJson(json, type);
+        if (bookmarkslist == null) {
+            bookmarkslist = new ArrayList<>();
 
+        }
+    }
+
+    private boolean modelMacth() {
+        boolean macth = false;
+        int i = 0;
+        for (QuestionModel model : bookmarkslist) {
+            i++;
+            if (model.getQuestion().equals(list.get(potion).getQuestion())
+                    && model.getCorrectAns().equals(list.get(potion).getCorrectAns())
+                    && model.getSetno() == list.get(potion).getSetno()) {
+                macth = true;
+                macthQuePosition = i;
+            }
+            i++;
+        }
+        return macth;
+
+
+    }
+
+    private void storeBookmarks() {
+        String json = gson.toJson(bookmarkslist);
+        editor.putString(KEY_NAME, json);
+        editor.commit();
+
+    }
 }

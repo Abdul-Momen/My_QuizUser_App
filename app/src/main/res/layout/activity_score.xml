@@ -1,9 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".ScoreActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:padding="8dp"
+            android:textStyle="bold"
+            android:textSize="16dp"
+
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name" />
+
+        <TextView
+            android:textSize="38dp"
+            android:padding="24dp"
+            android:textAlignment="center"
+            android:id="@+id/tv_Score_id"
+            android:textColor="@color/colorAccent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Score" />
+
+        <TextView
+            android:textColor="@color/colorAccent"
+            android:textSize="38dp"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:id="@+id/tv_score_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5" />
+
+        <TextView
+            android:textColor="@color/colorAccent"
+            android:textSize="38dp"
+            android:padding="24dp"
+            android:textAlignment="center"
+            android:id="@+id/total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OUT OF 10" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="303dp"
+        android:layout_weight="1" >
+
+        <Button
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_corner_button"
+            android:textColor="@color/colorAccent"
+            android:id="@+id/done_button_id"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="done" />
+
+    </FrameLayout>
+
+
+
+</LinearLayout>
